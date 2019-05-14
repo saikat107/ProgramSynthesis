@@ -6,8 +6,8 @@ import re
 import numpy as np
 from collections import Counter
 
-from .hero import Hero
-from .utils import Tcolors, get_rng
+from karel_base.hero import Hero
+from karel_base.utils import Tcolors, get_rng
 
 def draw2d(array):
     print("\n".join(["".join(["#" if val > 0 else "." for val in row]) for row in array]))
@@ -20,7 +20,7 @@ def hero_action(func):
         self = args[0]
         out = func(self)
         if self.debug:
-            print(func.__doc__, out)
+            # print(func.__doc__, out)
             self.draw()
         return out
     return fn
@@ -29,8 +29,8 @@ def marker_action(func):
     def fn(*args, **kwargs):
         self = args[0]
         out = func(self)
-        if self.debug:
-            print(func.__doc__, out)
+        # if self.debug:
+            # print(func.__doc__, out)
         return out
     return fn
 
@@ -78,7 +78,14 @@ class Karel(object):
                 np.expand_dims(state, -1),
                 [1, 1, self.hero_direction + 1 + (self.max_marker + 1)])
 
-        if self.debug: self.draw()
+        self.execution_trace = []
+        # if self.debug: self.draw()
+
+    def init_execution_trace(self):
+        self.execution_trace = []
+
+    def get_execution_trace(self):
+        return self.execution_trace
 
     def __enter__(self):
         self.start_screen()
@@ -286,16 +293,19 @@ class Karel(object):
             success = False
         else:
             self.hero.move()
+        self.execution_trace.append('move')
         return success
 
     @hero_action
     def turn_left(self):
         '''Turn left'''
+        self.execution_trace.append('turn_left')
         self.hero.turn_left()
 
     @marker_action
     def turn_right(self):
         '''Turn right'''
+        self.execution_trace.append('turn_right')
         self.hero.turn_right()
 
     @marker_action
@@ -306,6 +316,7 @@ class Karel(object):
             if coord == self.hero.position:
                 del self.markers[i]
                 self.hero.pick_marker()
+                self.execution_trace.append('pick_marker')
                 break
         else:
             #raise Exception('can\'t pick marker from empty location')
@@ -320,11 +331,13 @@ class Karel(object):
         else:
             self.markers.append(self.hero.position)
             self.hero.put_marker()
+            self.execution_trace.append('put_marker')
         return Counter(self.markers)[self.hero.position]
 
     @world_condition
     def front_is_clear(self):
-        '''Check front is clear'''
+        # '''Check front is clear'''
+        self.execution_trace.append('front_is_clear')
         return self._front_is_clear()
 
     def _front_is_clear(self):
@@ -334,7 +347,8 @@ class Karel(object):
 
     @world_condition
     def left_is_clear(self):
-        '''Check left is clear'''
+        # '''Check left is clear'''
+        self.execution_trace.append('left_is_clear')
         return self._left_is_clear()
 
     def _left_is_clear(self):
@@ -344,7 +358,8 @@ class Karel(object):
 
     @world_condition
     def right_is_clear(self):
-        '''Check right is clear'''
+        # '''Check right is clear'''
+        self.execution_trace.append('right_is_clear')
         return self._right_is_clear()
 
     def _right_is_clear(self):
@@ -354,12 +369,14 @@ class Karel(object):
 
     @world_condition
     def markers_present(self):
-        '''Check markers present'''
+        # '''Check markers present'''
+        self.execution_trace.append('marker_present')
         return self.hero.position in self.markers
 
     @world_condition
     def no_markers_present(self):
-        '''Check no markers present'''
+        # '''Check no markers present'''
+        self.execution_trace.append('no_marker_present')
         return self.hero.position not in self.markers
 
     @property

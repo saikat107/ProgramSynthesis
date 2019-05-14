@@ -66,6 +66,7 @@ import sys
 import os.path
 import inspect
 import warnings
+import karel_base.utils as utils
 
 __version__    = '3.11'
 __tabversion__ = '3.10'
@@ -324,11 +325,14 @@ class LRParser:
         if debug or yaccdevel:
             if isinstance(debug, int):
                 debug = PlyLogger(sys.stderr)
-            return self.parsedebug(input, lexer, debug, tracking, tokenfunc)
+            dbg_res = self.parsedebug(input, lexer, debug, tracking, tokenfunc)
         elif tracking:
-            return self.parseopt(input, lexer, debug, tracking, tokenfunc)
+            dbg_res = self.parseopt(input, lexer, debug, tracking, tokenfunc)
         else:
-            return self.parseopt_notrack(input, lexer, debug, tracking, tokenfunc)
+            dbg_res = self.parseopt_notrack(input, lexer, debug, tracking, tokenfunc)
+
+        # utils.debug(dbg_res)
+        return dbg_res
 
 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

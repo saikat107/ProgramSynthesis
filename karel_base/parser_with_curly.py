@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from .parser_base import dummy, get_hash, parser_prompt, Parser
+from karel_base.parser_base import dummy, get_hash, parser_prompt, Parser
 
 
 class KarelWithCurlyParser(Parser):

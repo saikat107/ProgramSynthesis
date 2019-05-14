@@ -1,9 +1,12 @@
 import os
 import errno
 import signal
+from datetime import datetime
+
 import numpy as np
 from functools import wraps
 from pyparsing import nestedExpr
+
 
 class TimeoutError(Exception):
     pass
@@ -22,7 +25,31 @@ class Tcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+
+def traverse(parseObject):
+    name = parseObject.slice[0]
+    childs = parseObject.slice
+
+
+
+def debug(*msg):
+    time = datetime.now()
+    timestr = str(time.strftime('%X'))
+    import inspect
+    file_path = inspect.stack()[1][1]
+    line_num = inspect.stack()[1][2]
+    file_name = file_path
+    if os.getcwd() in file_path:
+        file_name = file_path[len(os.getcwd())+1:]
+    stack = str(file_name) + '#' + str(line_num) + ' [' + timestr + ']'
+    print(stack, end=' ')
+    res = '\t'
+    for ms in msg:
+        res += (str(ms) + ' ')
+    print(res)
+
+
+def timeout(seconds=500, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
             raise TimeoutError(error_message)

@@ -3,8 +3,13 @@ import os
 import argparse
 import numpy as np
 
-from karel import KarelWithCurlyParser, KarelForSynthesisParser
-from karel import str2bool, makedirs, pprint, beautify, TimeoutError
+# from karel_base import KarelWithCurlyParser, KarelForSynthesisParser
+from karel_base.utils import str2bool, makedirs, pprint, beautify, TimeoutError
+# from karel_base import KarelWithCurlyParser , KarelForSynthesisParser
+from karel_base.parser_for_synthesis import KarelForSynthesisParser
+from karel_base.parser_with_curly import KarelWithCurlyParser
+
+from karel_base.utils import makedirs , beautify
 
 try:
     from tqdm import trange
@@ -77,7 +82,7 @@ if __name__ == '__main__':
                     outputs.append(output)
 
                     token_idxes = parser.lex_to_idx(code, details=True)
-                    codes.append(token_idxes)
+                    codes.append(code)
                     code_lengths.append(len(token_idxes))
                     break
 
