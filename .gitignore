@@ -117,6 +117,7 @@ Session.vim
 # temporary
 .netrwhist
 *~
+.idea/*
 # auto-generated tag files
 tags
 

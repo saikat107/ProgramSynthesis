@@ -337,7 +337,7 @@ class Karel(object):
     @world_condition
     def front_is_clear(self):
         # '''Check front is clear'''
-        self.execution_trace.append('front_is_clear')
+        # self.execution_trace.append('front_is_clear')
         return self._front_is_clear()
 
     def _front_is_clear(self):
@@ -348,7 +348,7 @@ class Karel(object):
     @world_condition
     def left_is_clear(self):
         # '''Check left is clear'''
-        self.execution_trace.append('left_is_clear')
+        # self.execution_trace.append('left_is_clear')
         return self._left_is_clear()
 
     def _left_is_clear(self):
@@ -359,7 +359,7 @@ class Karel(object):
     @world_condition
     def right_is_clear(self):
         # '''Check right is clear'''
-        self.execution_trace.append('right_is_clear')
+        # self.execution_trace.append('right_is_clear')
         return self._right_is_clear()
 
     def _right_is_clear(self):
@@ -370,13 +370,13 @@ class Karel(object):
     @world_condition
     def markers_present(self):
         # '''Check markers present'''
-        self.execution_trace.append('marker_present')
+        # self.execution_trace.append('marker_present')
         return self.hero.position in self.markers
 
     @world_condition
     def no_markers_present(self):
         # '''Check no markers present'''
-        self.execution_trace.append('no_marker_present')
+        # self.execution_trace.append('no_marker_present')
         return self.hero.position not in self.markers
 
     @property
@@ -416,3 +416,47 @@ class Karel(object):
     turnLeft = turn_left
     pickMarker = pick_marker
     putMarker = put_marker
+
+    def get_vectors(self):
+        agent_vector = []
+        condition_vector = []
+        if self.facing_north:
+            agent_vector.append(1)
+        else:
+            agent_vector.append(0)
+        if self.facing_south:
+            agent_vector.append(1)
+        else:
+            agent_vector.append(0)
+        if self.facing_east:
+            agent_vector.append(1)
+        else:
+            agent_vector.append(0)
+        if self.facing_west:
+            agent_vector.append(1)
+        else:
+            agent_vector.append(0)
+        agent_vector = np.asarray(agent_vector)
+        if self.front_is_clear():
+            condition_vector.append(1)
+        else:
+            condition_vector.append(0)
+        if self.left_is_clear():
+            condition_vector.append(1)
+        else:
+            condition_vector.append(0)
+        if self.right_is_clear():
+            condition_vector.append(1)
+        else:
+            condition_vector.append(0)
+        if self.markers_present():
+            condition_vector.append(1)
+        else:
+            condition_vector.append(0)
+        if self.no_markers_present():
+            condition_vector.append(1)
+        else:
+            condition_vector.append(0)
+        condition_vector = np.asarray(condition_vector)
+        return agent_vector, condition_vector
+
