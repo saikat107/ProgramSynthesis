@@ -79,13 +79,20 @@ class Karel(object):
                 [1, 1, self.hero_direction + 1 + (self.max_marker + 1)])
 
         self.execution_trace = []
+        self.condition_trace = []
+        self.condition_trace.append(self.get_vectors())
         # if self.debug: self.draw()
 
     def init_execution_trace(self):
         self.execution_trace = []
+        self.condition_trace = []
+        self.condition_trace.append(self.get_vectors())
 
     def get_execution_trace(self):
         return self.execution_trace
+
+    def get_condition_trace(self):
+        return self.condition_trace
 
     def __enter__(self):
         self.start_screen()
@@ -293,7 +300,8 @@ class Karel(object):
             success = False
         else:
             self.hero.move()
-        self.execution_trace.append('move')
+            self.execution_trace.append('move')
+            self.condition_trace.append(self.get_vectors())
         return success
 
     @hero_action
@@ -301,12 +309,14 @@ class Karel(object):
         '''Turn left'''
         self.execution_trace.append('turn_left')
         self.hero.turn_left()
+        self.condition_trace.append(self.get_vectors())
 
     @marker_action
     def turn_right(self):
         '''Turn right'''
         self.execution_trace.append('turn_right')
         self.hero.turn_right()
+        self.condition_trace.append(self.get_vectors())
 
     @marker_action
     def pick_marker(self):
@@ -316,6 +326,7 @@ class Karel(object):
             if coord == self.hero.position:
                 del self.markers[i]
                 self.hero.pick_marker()
+                self.condition_trace.append(self.get_vectors())
                 self.execution_trace.append('pick_marker')
                 break
         else:
@@ -331,6 +342,7 @@ class Karel(object):
         else:
             self.markers.append(self.hero.position)
             self.hero.put_marker()
+            self.condition_trace.append(self.get_vectors())
             self.execution_trace.append('put_marker')
         return Counter(self.markers)[self.hero.position]
 
@@ -418,25 +430,17 @@ class Karel(object):
     putMarker = put_marker
 
     def get_vectors(self):
-        agent_vector = []
+        agent_status = ''
         condition_vector = []
         if self.facing_north:
-            agent_vector.append(1)
-        else:
-            agent_vector.append(0)
-        if self.facing_south:
-            agent_vector.append(1)
-        else:
-            agent_vector.append(0)
-        if self.facing_east:
-            agent_vector.append(1)
-        else:
-            agent_vector.append(0)
-        if self.facing_west:
-            agent_vector.append(1)
-        else:
-            agent_vector.append(0)
-        agent_vector = np.asarray(agent_vector)
+            agent_status = '^'
+        elif self.facing_south:
+            agent_status = 'v'
+        elif self.facing_east:
+            agent_status = '>'
+        elif self.facing_west:
+            agent_status = '<'
+        # agent_vector = np.asarray(agent_status)
         if self.front_is_clear():
             condition_vector.append(1)
         else:
@@ -458,5 +462,8 @@ class Karel(object):
         else:
             condition_vector.append(0)
         condition_vector = np.asarray(condition_vector)
-        return agent_vector, condition_vector
+        return {
+            'agent_status': agent_status,
+            'condition_vector': condition_vector
+        }
 

@@ -4,18 +4,21 @@ from karel_base.parser_for_synthesis import KarelForSynthesisParser
 from karel_base.utils import beautify
 import pickle
 
-data = np.load('data/test.npz')
+# data = np.load('data/test.npz')
 full_data = []
-for code in data['codes']:
+codes = ['DEF run m( IFELSE c( frontIsClear c) i( turnRight move i) ELSE e( turnLeft move e) IFELSE c( leftIsClear c) i( turnRight move i) ELSE e( turnLeft move e) m)']
+for code in codes:
     parser = KarelForSynthesisParser()
     inputs = []
     outputs = []
     valid_inputs = []
     traces = []
+    vectors = []
     count= 0
     total = 0
     success = True
     # print(beautify(code))
+    examples = []
     while count != 6:
         try:
             total = 0
@@ -35,10 +38,19 @@ for code in data['codes']:
             parser.run(code)
             output_state = parser.get_state()
             execution_trace = parser.karel.get_execution_trace()
+            trace_vectors = parser.karel.get_condition_trace()
+            vectors.append(trace_vectors)
             count += 1
             inputs.append(input_state)
             outputs.append(output_state)
             traces.append(execution_trace)
+            example_details = {
+                'input': input_state,
+                'output': output_state,
+                'trace': execution_trace,
+                'state_vectors': trace_vectors
+            }
+            examples.append(example_details)
             valid_inputs.append(input_state.tobytes())
         except:
             total += 1
@@ -47,17 +59,12 @@ for code in data['codes']:
                 break
 
     if success:
-        full_data.append({
+        data_dict = {
             'code': code,
-            'inputs': inputs,
-            'outputs': outputs,
-            'trace': traces
-        })
-        print(beautify(code))
-        print(len(inputs), len(outputs))
-        for trace in traces:
-            print(trace)
-        print('='*50)
+            'examples': examples
+        }
+        full_data.append(data_dict)
+        print(data_dict)
 
 dest_file = open('data.bin', 'wb')
 pickle.dump(full_data, dest_file)
