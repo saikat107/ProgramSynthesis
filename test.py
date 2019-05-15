@@ -1,7 +1,7 @@
 import numpy as np
 from karel_base import karel
 from karel_base.parser_for_synthesis import KarelForSynthesisParser
-from karel_base.utils import beautify
+from karel_base.utils import beautify, TimeoutError
 import pickle
 import os
 
@@ -28,6 +28,7 @@ for datatype in ['test', 'train', 'val']:
         success = True
         # print(beautify(code))
         examples = []
+        counter_ex = 0
         while count != 6:
             try:
                 total = 0
@@ -36,17 +37,13 @@ for datatype in ['test', 'train', 'val']:
                 input_state = parser.get_state()
                 # assert isinstance(input_state, np.ndarray)
                 if input_state.tobytes() in valid_inputs:
-                    parser.draw()
-                    total += 1
-                    if total == 25:
-                        success = False
-                        break
-                    continue
-                # else:
-                #     parser.draw()
+                    raise IndexError('repeat')
                 parser.run(code)
                 output_state = parser.get_state()
                 execution_trace = parser.karel.get_execution_trace()
+                if len(execution_trace) == 0:
+                    counter_ex += 1
+                    raise IndexError('no_exec')
                 trace_vectors = parser.karel.get_condition_trace()
                 vectors.append(trace_vectors)
                 count += 1
@@ -61,12 +58,26 @@ for datatype in ['test', 'train', 'val']:
                 }
                 examples.append(example_details)
                 valid_inputs.append(input_state.tobytes())
-            except:
+            except IndexError as e:
+                # print(e)
+                # print(total, counter_ex)
                 total += 1
                 if total == 25:
                     success = False
                     break
-
+                if counter_ex == 25:
+                    success = False
+                    break
+            except TimeoutError as e:
+                # print(e)
+                # print(total, counter_ex)
+                total += 1
+                if total == 25:
+                    success = False
+                    break
+                if counter_ex == 25:
+                    success = False
+                    break
         if success:
             data_dict = {
                 'code': code,

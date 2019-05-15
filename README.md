@@ -55,7 +55,7 @@ There are two types of parser which can be defined with `--parser_type`:
 
 To generate programs and its input/output examples:
 
-    $ python generate.py --data_dir=data --max_depth=5 --parser_type=synthesis
+    $ python karel_base/generate.py --data_dir=data --max_depth=5 --parser_type=synthesis
 
 which will generate `data/train.npz`, `data/test.npz` and `data/val.npz` and you can use these data with:
 
