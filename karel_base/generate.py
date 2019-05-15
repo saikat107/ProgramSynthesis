@@ -19,7 +19,7 @@ except:
 
 if __name__ == '__main__':
     data_arg = argparse.ArgumentParser()
-    data_arg.add_argument('--num_train', type=int, default=1000000)
+    data_arg.add_argument('--num_train', type=int, default=40000)
     data_arg.add_argument('--num_test', type=int, default=5000)
     data_arg.add_argument('--num_val', type=int, default=5000)
     data_arg.add_argument('--num_examples', type=int, default=2)
@@ -35,6 +35,7 @@ if __name__ == '__main__':
     # Make directories
     makedirs(config.data_dir)
     datasets = ['train', 'test', 'val']
+    codes = []
 
     # Generate datasets
     if config.parser_type == "curly":
@@ -60,14 +61,17 @@ if __name__ == '__main__':
     else:
         for name in datasets:
             data_num = getattr(config, "num_{}".format(name))
-
+            # codes = []
+            count = 0
             inputs, outputs, codes, code_lengths = [], [], [], []
-            for _ in trange(data_num):
+            while True:
                 while True:
                     parser.new_game(world_size=(config.world_width, config.world_height))
                     input = parser.get_state()
 
                     code = parser.random_code(stmt_max_depth=config.max_depth)
+                    if code in codes:
+                        continue
                     #pprint(code)
 
                     try:
@@ -80,10 +84,15 @@ if __name__ == '__main__':
 
                     inputs.append(input)
                     outputs.append(output)
+                    count += 1
+                    if count % 100 == 0:
+                        print(name, data_num, count)
 
                     token_idxes = parser.lex_to_idx(code, details=True)
                     codes.append(code)
                     code_lengths.append(len(token_idxes))
+                    break
+                if count == data_num:
                     break
 
             npz_path = os.path.join(config.data_dir, name)

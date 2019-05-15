@@ -1,6 +1,6 @@
 # Log
 logs
-
+processed_data/*
 # Data
 *.txt
 *.npz

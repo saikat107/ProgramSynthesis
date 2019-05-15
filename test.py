@@ -8,11 +8,15 @@ import os
 
 if not os.path.exists('processed_data'):
     os.mkdir('processed_data')
-for datatype in ['test, train', 'val']:
+for datatype in ['test', 'train', 'val']:
     data = np.load('data/' + datatype + '.npz')
+    print('Read : ' + datatype + '.npz')
     full_data = []
     # codes = ['DEF run m( IFELSE c( frontIsClear c) i( turnRight move i) ELSE e( turnLeft move e) IFELSE c( leftIsClear c) i( turnRight move i) ELSE e( turnLeft move e) m)']
-    for code in data['codes']:
+    print('# examples : ', len(data['codes']))
+    for idx, code in enumerate(data['codes']):
+        if idx % 100 == 0:
+            print(idx)
         parser = KarelForSynthesisParser()
         inputs = []
         outputs = []
@@ -70,7 +74,7 @@ for datatype in ['test, train', 'val']:
             }
             full_data.append(data_dict)
             # print(data_dict)
-    dest_file = open('processed_data/' + datatype +  '.bin', 'wb')
-    pickle.dump(full_data, dest_file)
-    dest_file.close()
+    dest_file = 'processed_data/' + datatype +  '.npz'
+    np.savez(dest_file, data=full_data)
+    # dest_file.close()
 
