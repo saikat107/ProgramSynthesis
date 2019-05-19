@@ -9,16 +9,16 @@ def g_ast(code):
         parser = KarelForSynthesisParserOnly()
         parser.debug = False
         parser.new_game(world_size=(8, 8))
-        input = parser.get_state()
-        print(input.shape)
+        # input = parser.get_state()
+        # # print(input.shape)
         parser.init_new_rule_queue()
         parser.run(code, debug=False)
         tree = parser.get_tree()
-        gen_code = get_code_from_tree(tree)
-
-        parser.init_new_rule_queue()
-        parser.run(gen_code, debug=False)
-        tree2 = parser.get_tree()
+        # gen_code = get_code_from_tree(tree)
+        #
+        # parser.init_new_rule_queue()
+        # parser.run(gen_code, debug=False)
+        # tree2 = parser.get_tree()
         # print(tree)
         # print(tree2)
         # print(code)
@@ -39,12 +39,12 @@ def g_ast(code):
         print('==============')
 
 
-data = np.load('data/test.npz')
-for code in data['codes']:
-    # print(code)
-    tree = g_ast(code)
-    # print(tree)
-    g_code = get_code_from_tree(tree, pretty=True)
-    # print(g_code)
-    # print('=============================================')
+# data = np.load('data/test.npz')
+# for code in data['codes']:
+#     print(code)
+#     tree = g_ast(code)
+#     print(tree)
+#     g_code = get_code_from_tree(tree, pretty=True)
+#     # print(g_code)
+#     # print('=============================================')
 
